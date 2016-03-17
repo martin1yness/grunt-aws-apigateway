@@ -36,6 +36,12 @@ grunt.initConfig({
                 "/users": {
                     methods: {
                         GET: {
+                            requestModels: {
+                                "application/json": "TheNameOfMyModel"
+                            },
+                            requestParameters: {
+                                "method.request.querystring.myurlqueryparamname": false
+                            },
                             integration: {
                                 type: "AWS",
                                 uri: "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:xxx:function:getUsers/invocations",
