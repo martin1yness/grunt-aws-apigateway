@@ -125,36 +125,38 @@ module.exports = function (grunt) {
 
         // Prepare request (with defaults)
         var params = {
-            authorizationType: methodSetup.authorizationType || "NONE",
-            httpMethod       : method,
-            resourceId       : resource.id,
-            restApiId        : restApiId,
-            apiKeyRequired   : methodSetup.apiKeyRequired || false
+            authorizationType   : methodSetup.authorizationType || "NONE",
+            httpMethod          : method,
+            resourceId          : resource.id,
+            restApiId           : restApiId,
+            apiKeyRequired      : methodSetup.apiKeyRequired || false,
+            requestModels       : methodSetup.requestModels || {},
+            requestParameters   : methodSetup.requestParameters || {},
         };
 
         async.series([
-            function(done) {
-                // Create method
-                apigateway.putMethod(params, function(err) {
-                    done(err ? new Error("Unable to create method request " + method + " for resource " + resource.path + ": " + err.message) : null);
-                });
-            },
-            function(done) {
-                // Create integration
-                _createResourceIntegrationRequest(resource, method, methodSetup.integration, done);
-            },
-            function(done) {
-                // Create method responses
-                async.forEachOfSeries(methodSetup.responses || {}, function(responseSetup, status, innerDone) {
-                    _createResourceMethodResponse(resource, method, status, responseSetup, innerDone);
-                }, done);
-            },
-            function(done) {
-                // Create integration responses
-                async.forEachOfSeries(methodSetup.responses || {}, function(responseSetup, status, innerDone) {
-                    _createResourceIntegrationResponse(resource, method, status, responseSetup, innerDone);
-                }, done);
-            }],
+                function(done) {
+                    // Create method
+                    apigateway.putMethod(params, function(err) {
+                        done(err ? new Error("Unable to create method request " + method + " for resource " + resource.path + ": " + err.message) : null);
+                    });
+                },
+                function(done) {
+                    // Create integration
+                    _createResourceIntegrationRequest(resource, method, methodSetup.integration, done);
+                },
+                function(done) {
+                    // Create method responses
+                    async.forEachOfSeries(methodSetup.responses || {}, function(responseSetup, status, innerDone) {
+                        _createResourceMethodResponse(resource, method, status, responseSetup, innerDone);
+                    }, done);
+                },
+                function(done) {
+                    // Create integration responses
+                    async.forEachOfSeries(methodSetup.responses || {}, function(responseSetup, status, innerDone) {
+                        _createResourceIntegrationResponse(resource, method, status, responseSetup, innerDone);
+                    }, done);
+                }],
             callback
         );
     }
